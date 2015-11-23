@@ -31,6 +31,8 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   printGreen "Installing dependencies..."
   sudo apt-get -y update
   sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev
+  #need apache php
+
 #  sudo apt-get -y install zabbix-agent
 #  sudo apt-get -y install zabbix-server-mysql
 #  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
@@ -76,6 +78,13 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   sudo cp misc/init.d/ubuntu/zabbix-server.conf /etc/init.d/zabbix-server
   sudo chmod 755 /etc/init.d/zabbix-server
+
+  #printGreen "Copying Zabbix frontend files..."
+  mkdir --parents /opt/zabbix/active_frontend
+  sudo cp --archive frontends/php/* /opt/zabbix/active_frontend
+  sudo bash -c "echo \"
+Alias /zabbix /opt/zabbix/active_frontend > /etc/apache2/sites-available/zabbix.conf"
+  sudo a2ensite zabbix.conf
 
   #tuning php for Zabbix
   sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/cli/php.ini
