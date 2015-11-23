@@ -30,7 +30,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   CURDIR=`pwd`
   printGreen "Installing dependencies..."
   sudo apt-get -y update
-  sudo apt-get -y install debconf-utils
+  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev
 #  sudo apt-get -y install zabbix-agent
 #  sudo apt-get -y install zabbix-server-mysql
 #  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
@@ -57,16 +57,19 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   Q3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
   Q4="FLUSH PRIVILEGES;"
   SQL="${Q1}${Q2}${Q3}${Q4}"
-  mysql --verbose --user=root --password=${MYSQL_PW} --database=mysql --execute="${SQL}"
+  mysql --user=root --password=${MYSQL_PW} --database=mysql --execute="${SQL}"
   printGreen "Applying schema.sql..."
-  mysql --verbose --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
+  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
   printGreen "Applying images.sql..."
-  mysql --verbose --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
+  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
   printGreen "Applying data.sql..."
-  mysql --verbose --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
+  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
 
 
-  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
+  sudo mkdir --parents /etc/zabbix
+  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2 --prefix=/etc/zabbix
+
+  sudo make install
 
   #tuning php for Zabbix
 #  sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
