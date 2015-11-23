@@ -4,42 +4,47 @@
 
 printPlain() { /bin/echo -e "${1}" >&2; }
 printGreen() { /bin/echo -e "\033[32;1m${1}\033[0m" >&2; }
-printBlue() { /bin/echo -e "\033[34;1m${1}\033[0m" >&2; }
-printYellow() { /bin/echo -e "\033[33;1m${1}\033[0m" >&2; }
-printRed() { /bin/echo -e "\033[31;1m${1}\033[0m" >&2; }
+printBlue()  { /bin/echo -e "\033[34;1m${1}\033[0m" >&2; }
+printYellow(){ /bin/echo -e "\033[33;1m${1}\033[0m" >&2; }
+printRed()   { /bin/echo -e "\033[31;1m${1}\033[0m" >&2; }
 
-printGreen "Installing some dependencies..."
-sudo apt-get update
-
+ZABBIX_FILE = "zabbix-2.4.7.tar.gz"
 
 ############
 #Install and setup zabbix-server
-INSTALL_ZABBIX=1
-#Make sure mysql-client is installed
-printGreen "Installing mysql-client"
-sudo apt-get update
-sudo apt-get -y install mysql-client
-if [ -e /usr/share/zabbix-server ]; then
-  read -p "Zabbix is already installed, reinstall? (y/n): " -e REINSTALL_ZABBIX
-  if [ "${REINSTALL_ZABBIX}" != 'y' ]; then
-    INSTALL_ZABBIX=0
-  fi
-fi
+INSTALL_ZABBIX = 1
+#if [ -e /usr/share/zabbix-server ]; then
+#  read -p "Zabbix is already installed, reinstall? (y/n): " -e REINSTALL_ZABBIX
+#  if [ "${REINSTALL_ZABBIX}" != 'y' ]; then
+#    INSTALL_ZABBIX=0
+#  fi
+#fi
 if [ $INSTALL_ZABBIX -eq 1 ]; then
-  printGreen "Installing Zabbix..."
-  wget http://repo.zabbix.com/zabbix/2.4/ubuntu/pool/main/z/zabbix-release/zabbix-release_2.4-1+trusty_all.deb
-  dpkg -i zabbix-release_2.4-1+trusty_all.deb
+  printGreen "Installing dependencies..."
   sudo apt-get -y update
-  sudo apt-get -y install zabbix-agent
-  sudo apt-get -y install zabbix-server-mysql
-  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
+  sudo apt-get -y install php5-mysql
+#  sudo apt-get -y install zabbix-agent
+#  sudo apt-get -y install zabbix-server-mysql
+#  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
+
+  printGreen "Installing mysql-server..."
+  printGreen "You will need to set a root password"
+  sudo apt-get -y install mysql-server
+
+  printGreen "Installing Zabbix..."
+  sudo mkdir /opt/zabbix/
+  sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --ask-password "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
+  sudo tar -zxvf /opt/zabbix/${ZABBIX_FILE}
+
+  sudo groupadd zabbix
+  sudo useradd -g zabbix zabbix
 
   #tuning php for Zabbix
   sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
   sudo sed -r -i -e "s/max_execution_time = 30/max_execution_time = 300/g" /etc/php5/apache2/php.ini
   sudo sed -r -i -e "s/max_input_time = 60/max_input_time = 300/g" /etc/php5/apache2/php.ini
   sudo sed -r -i -e "s/;date\.timezone =/date.timezone = \"America\/New_York\"/g" /etc/php5/apache2/php.ini
-  sudo /etc/init.d/apache2 reload
+#  sudo /etc/init.d/apache2 reload
   
   #mysql tuning
   sudo bash -c "echo \"
@@ -69,13 +74,13 @@ table_cache=256\" >> /etc/mysql/conf.d/zabbix_tuning.cnf"
   sudo service mysql restart
   
   #link in vitalscli script
-  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /etc/zabbix/alertscripts/
-  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /etc/zabbix/externalscripts/
-  sudo usermod -s /bin/bash zabbix  
+#  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /etc/zabbix/alertscripts/
+#  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /etc/zabbix/externalscripts/
+#  sudo usermod -s /bin/bash zabbix
 
   #zabbix user has to be able to sudo as vitalscli user to run vitalscli  
-  sudo bash -c "echo -e \"zabbix  ALL=(vitalscli) NOPASSWD: ALL\" > /etc/sudoers.d/vitalscli_zabbix"
-  sudo chmod 440 /etc/sudoers.d/vitalscli_zabbix
-  sudo /etc/init.d/sudo restart
+#  sudo bash -c "echo -e \"zabbix  ALL=(vitalscli) NOPASSWD: ALL\" > /etc/sudoers.d/vitalscli_zabbix"
+#  sudo chmod 440 /etc/sudoers.d/vitalscli_zabbix
+#  sudo /etc/init.d/sudo restart
 
 fi
