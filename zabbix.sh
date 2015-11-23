@@ -20,6 +20,7 @@ INSTALL_ZABBIX=1
 #  fi
 #fi
 if [ $INSTALL_ZABBIX -eq 1 ]; then
+  CURDIR=`pwd`
   printGreen "Installing dependencies..."
   sudo apt-get -y update
   sudo apt-get -y install php5-mysql
@@ -38,6 +39,9 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
+
+  cd /opt/zabbix/${ZABBIX_FILE}
+  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
   #tuning php for Zabbix
   sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
@@ -83,4 +87,5 @@ table_cache=256\" >> /etc/mysql/conf.d/zabbix_tuning.cnf"
 #  sudo chmod 440 /etc/sudoers.d/vitalscli_zabbix
 #  sudo /etc/init.d/sudo restart
 
+  cd ${CURDIR}
 fi
