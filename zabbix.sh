@@ -48,6 +48,18 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
 
+  #MYSQL SETUP
+  SQL1="CREATE USER 'zabbix'@'localhost' IDENTIFIED BY '${MYSQL_PW}';"
+  SQL2="CREATE DATABASE IF NOT EXISTS zabbix;"
+  SQL3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
+  SQL4="FLUSH PRIVILEGES;"
+  SQL=${SQL1}${SQL2}${SQL3}${SQL4}
+  mysql --verbose --user=root --password=root --database=mysql --execute=${SQL}
+
+  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
+  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
+  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
+
   # strips .tar.gz extension from file for path
   cd /opt/zabbix/"${ZABBIX_FILE%.tar.gz}"
   ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
