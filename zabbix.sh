@@ -8,11 +8,11 @@ printBlue()  { /bin/echo -e "\033[34;1m${1}\033[0m" >&2; }
 printYellow(){ /bin/echo -e "\033[33;1m${1}\033[0m" >&2; }
 printRed()   { /bin/echo -e "\033[31;1m${1}\033[0m" >&2; }
 
-ZABBIX_FILE = "zabbix-2.4.7.tar.gz"
+ZABBIX_FILE="zabbix-2.4.7.tar.gz"
 
 ############
 #Install and setup zabbix-server
-INSTALL_ZABBIX = 1
+INSTALL_ZABBIX=1
 #if [ -e /usr/share/zabbix-server ]; then
 #  read -p "Zabbix is already installed, reinstall? (y/n): " -e REINSTALL_ZABBIX
 #  if [ "${REINSTALL_ZABBIX}" != 'y' ]; then
