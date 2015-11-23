@@ -58,10 +58,12 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   Q4="FLUSH PRIVILEGES;"
   SQL="${Q1}${Q2}${Q3}${Q4}"
   mysql --verbose --user=root --password=${MYSQL_PW} --database=mysql --execute="${SQL}"
-
-  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
-  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
-  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
+  printGreen "Applying schema.sql..."
+  mysql --verbose --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
+  printGreen "Applying images.sql..."
+  mysql --verbose --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
+  printGreen "Applying data.sql..."
+  mysql --verbose --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
 
 
   ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
