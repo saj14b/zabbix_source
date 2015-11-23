@@ -42,7 +42,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
 
-  cd /opt/zabbix/${ZABBIX_FILE}
+  cd /opt/zabbix/"${ZABBIX_FILE%.tar.gz}"
   ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
   #tuning php for Zabbix
