@@ -11,6 +11,12 @@ printRed()   { /bin/echo -e "\033[31;1m${1}\033[0m" >&2; }
 ZABBIX_FILE="zabbix-2.4.7.tar.gz"
 MYSQL_PW="root"
 
+###############################################################################
+# Temporary for debugging
+sudo service ntp stop
+sudo ntpdate -s time.nist.gov
+sudo service ntp start
+
 ############
 #Install and setup zabbix-server
 INSTALL_ZABBIX=1
@@ -42,6 +48,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
 
+  # strips .tar.gz extension from file for path
   cd /opt/zabbix/"${ZABBIX_FILE%.tar.gz}"
   ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
