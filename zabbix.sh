@@ -67,9 +67,12 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
 
   sudo mkdir --parents /etc/zabbix
-  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2 --prefix=/etc/zabbix
+  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
   sudo make install
+
+  sudo cp misc/init.d/ubuntu/zabbix-server.conf /etc/init.d/zabbix-server
+  sudo chmod 755 /etc/init.d/zabbix-server
 
   #tuning php for Zabbix
 #  sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
