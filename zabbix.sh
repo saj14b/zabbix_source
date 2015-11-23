@@ -30,8 +30,8 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 #  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
 
   printGreen "Installing mysql-server..."
-  sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password ${MYSQL_PW}'
-  sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password ${MYSQL_PW}'
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PW}"
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${MYSQL_PW}"
   sudo apt-get -y install mysql-server
 
   printGreen "Installing Zabbix..."
