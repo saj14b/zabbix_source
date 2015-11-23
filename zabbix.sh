@@ -30,7 +30,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   CURDIR=`pwd`
   printGreen "Installing dependencies..."
   sudo apt-get -y update
-  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev
+  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev apache2 php5-cli
   #need apache php
 
 #  sudo apt-get -y install zabbix-agent
