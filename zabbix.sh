@@ -53,7 +53,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   SQL2="CREATE DATABASE IF NOT EXISTS zabbix;"
   SQL3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
   SQL4="FLUSH PRIVILEGES;"
-  SQL=${SQL1}${SQL2}${SQL3}${SQL4}
+  SQL="${SQL1}${SQL2}${SQL3}${SQL4}"
   mysql --verbose --user=root --password=root --database=mysql --execute=${SQL}
 
   mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
