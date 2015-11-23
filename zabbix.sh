@@ -37,7 +37,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   printGreen "Installing Zabbix..."
   sudo mkdir --parents /opt/zabbix/
   sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --password=P6QbP41X "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
-  sudo tar -zxvf /opt/zabbix/${ZABBIX_FILE}
+  sudo tar -zxf /opt/zabbix/${ZABBIX_FILE}
 
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
