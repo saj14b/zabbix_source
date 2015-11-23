@@ -32,8 +32,8 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo apt-get -y install mysql-server
 
   printGreen "Installing Zabbix..."
-  sudo mkdir /opt/zabbix/
-  sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --ask-password "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
+  sudo mkdir --parents /opt/zabbix/
+  sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --password=P6QbP41X "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
   sudo tar -zxvf /opt/zabbix/${ZABBIX_FILE}
 
   sudo groupadd zabbix
