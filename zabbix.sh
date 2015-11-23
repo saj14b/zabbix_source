@@ -35,23 +35,26 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 #  sudo apt-get -y install zabbix-server-mysql
 #  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
 
-  printGreen "Installing mysql-server..."
-  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PW}"
-  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${MYSQL_PW}"
-  sudo apt-get -y install mysql-server
-
-  printGreen "Installing Zabbix..."
+  printGreen "Downloading Zabbix..."
   sudo mkdir --parents /opt/zabbix/
   sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --password=P6QbP41X "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
+  printGreen "Unpacking Zabbix..."
   sudo tar -zxf /opt/zabbix/${ZABBIX_FILE}
 
   # strips .tar.gz extension from file for path
   cd /opt/zabbix/"${ZABBIX_FILE%.tar.gz}"
 
+  printGreen "Adding zabbix user..."
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
 
   #MYSQL SETUP
+  printGreen "Installing mysql-server..."
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PW}"
+  sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${MYSQL_PW}"
+  sudo apt-get -y install mysql-server
+
+  printGreen "Building Zabbix tables..."
   Q1="CREATE USER 'zabbix'@'localhost' IDENTIFIED BY '${MYSQL_PW}';"
   Q2="CREATE DATABASE IF NOT EXISTS zabbix;"
   Q3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
@@ -75,11 +78,11 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo chmod 755 /etc/init.d/zabbix-server
 
   #tuning php for Zabbix
-#  sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
-#  sudo sed -r -i -e "s/max_execution_time = 30/max_execution_time = 300/g" /etc/php5/apache2/php.ini
-#  sudo sed -r -i -e "s/max_input_time = 60/max_input_time = 300/g" /etc/php5/apache2/php.ini
-#  sudo sed -r -i -e "s/;date\.timezone =/date.timezone = \"America\/New_York\"/g" /etc/php5/apache2/php.ini
-#  sudo /etc/init.d/apache2 reload
+  sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/cli/php.ini
+  sudo sed -r -i -e "s/max_execution_time = 30/max_execution_time = 300/g" /etc/php5/cli/php.ini
+  sudo sed -r -i -e "s/max_input_time = 60/max_input_time = 300/g" /etc/php5/cli/php.ini
+  sudo sed -r -i -e "s/;date\.timezone =/date.timezone = \"America\/New_York\"/g" /etc/php5/cli/php.ini
+  sudo /etc/init.d/apache2 reload
   
   #mysql tuning
   sudo bash -c "echo \"
