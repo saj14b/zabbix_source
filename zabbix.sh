@@ -45,23 +45,25 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --password=P6QbP41X "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
   sudo tar -zxf /opt/zabbix/${ZABBIX_FILE}
 
+  # strips .tar.gz extension from file for path
+  cd /opt/zabbix/"${ZABBIX_FILE%.tar.gz}"
+
   sudo groupadd zabbix
   sudo useradd -g zabbix zabbix
 
   #MYSQL SETUP
-  SQL1="CREATE USER 'zabbix'@'localhost' IDENTIFIED BY '${MYSQL_PW}';"
-  SQL2="CREATE DATABASE IF NOT EXISTS zabbix;"
-  SQL3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
-  SQL4="FLUSH PRIVILEGES;"
-  SQL="${SQL1}${SQL2}${SQL3}${SQL4}"
-  mysql --verbose --user=root --password=root --database=mysql --execute=${SQL}
+  Q1="CREATE USER 'zabbix'@'localhost' IDENTIFIED BY '${MYSQL_PW}';"
+  Q2="CREATE DATABASE IF NOT EXISTS zabbix;"
+  Q3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
+  Q4="FLUSH PRIVILEGES;"
+  SQL="${Q1}${Q2}${Q3}${Q4}"
+  mysql --verbose --user=root --password=${MYSQL_PW} --database=mysql --execute="${SQL}"
 
   mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
   mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
   mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
 
-  # strips .tar.gz extension from file for path
-  cd /opt/zabbix/"${ZABBIX_FILE%.tar.gz}"
+
   ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
   #tuning php for Zabbix
