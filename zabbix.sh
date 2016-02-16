@@ -91,10 +91,10 @@ Alias /zabbix /opt/zabbix/active_frontend
   sudo a2dissite 000-default.conf
 
   #tuning php for Zabbix
-  sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/cli/php.ini
-  sudo sed -r -i -e "s/max_execution_time = 30/max_execution_time = 300/g" /etc/php5/cli/php.ini
-  sudo sed -r -i -e "s/max_input_time = 60/max_input_time = 300/g" /etc/php5/cli/php.ini
-  sudo sed -r -i -e "s/;date\.timezone =/date.timezone = \"America\/New_York\"/g" /etc/php5/cli/php.ini
+  sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
+  sudo sed -r -i -e "s/max_execution_time = 30/max_execution_time = 300/g" /etc/php5/apache2/php.ini
+  sudo sed -r -i -e "s/max_input_time = 60/max_input_time = 300/g" /etc/php5/apache2/php.ini
+  sudo sed -r -i -e "s/;date\.timezone =/date.timezone = \"America\/New_York\"/g" /etc/php5/apache2/php.ini
   sudo /etc/init.d/apache2 reload
   
   #mysql tuning
