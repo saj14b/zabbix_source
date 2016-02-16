@@ -127,14 +127,14 @@ table_cache=256\" >> /etc/mysql/conf.d/zabbix_tuning.cnf"
   sudo service mysql restart
   
   #link in vitalscli script
-#  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /etc/zabbix/alertscripts/
-#  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /etc/zabbix/externalscripts/
-#  sudo usermod -s /bin/bash zabbix
+  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /usr/local/share/zabbix/alertscripts/
+  sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /usr/local/share/zabbix/externalscripts/
+  sudo usermod -s /bin/bash zabbix
 
   #zabbix user has to be able to sudo as vitalscli user to run vitalscli  
-#  sudo bash -c "echo -e \"zabbix  ALL=(vitalscli) NOPASSWD: ALL\" > /etc/sudoers.d/vitalscli_zabbix"
-#  sudo chmod 440 /etc/sudoers.d/vitalscli_zabbix
-#  sudo /etc/init.d/sudo restart
+  sudo bash -c "echo -e \"zabbix  ALL=(vitalscli) NOPASSWD: ALL\" > /etc/sudoers.d/vitalscli_zabbix"
+  sudo chmod 440 /etc/sudoers.d/vitalscli_zabbix
+  sudo /etc/init.d/sudo restart
 
   cd ${CURDIR}
 fi
