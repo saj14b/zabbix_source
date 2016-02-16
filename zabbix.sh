@@ -97,8 +97,11 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo update-rc.d zabbix-server defaults
 
   printGreen "Configuring Zabbix configuration files..."
+  sudo mkdir --parents /var/log/zabbix
+  sudo chown -R zabbix:zabbix /var/log/zabbix
+  sudo chmod 755 /var/log/zabbix
   sudo ln -s /usr/local/etc/zabbix_server.conf /etc/zabbix/zabbix_server.conf
-  sudo sed -r -i -e "s+LogFile=/tmp/zabbix_server.log+LogFile=/var/log/zabbix_server.log+g" /usr/local/etc/zabbix_server.conf
+  sudo sed -r -i -e "s+LogFile=/tmp/zabbix_server.log+LogFile=/var/log/zabbix/zabbix_server.log+g" /usr/local/etc/zabbix_server.conf
   sudo sed -r -i -e "s+DBUser=root+DBUser=zabbix+g" /usr/local/etc/zabbix_server.conf
   sudo sed -r -i -e "s+# DBPassword=+DBPassword=${ZABBIX_PW}+g" /usr/local/etc/zabbix_server.conf
 
@@ -161,3 +164,6 @@ table_cache=256\" >> /etc/mysql/conf.d/zabbix_tuning.cnf"
 
   cd ${CURDIR}
 fi
+
+sudo service zabbix-server start
+
