@@ -98,9 +98,9 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   printGreen "Configuring Zabbix configuration files..."
   sudo ln -s /usr/local/etc/zabbix_server.conf /etc/zabbix/zabbix_server.conf
-  sudo sed -r -i -e "s+LogFile=/tmp/zabbix_server.log+LogFile=/var/log/zabbix_server.log+g" /etc/zabbix/zabbix_server.conf
-  sudo sed -r -i -e "s+DBUser=root+DBUser=zabbix+g" /etc/zabbix/zabbix_server.conf
-  sudo sed -r -i -e "s+# DBPassword=+DBPassword=${ZABBIX_PW}+g" /etc/zabbix/zabbix_server.conf
+  sudo sed -r -i -e "s+LogFile=/tmp/zabbix_server.log+LogFile=/var/log/zabbix_server.log+g" /usr/local/etc/zabbix_server.conf
+  sudo sed -r -i -e "s+DBUser=root+DBUser=zabbix+g" /usr/local/etc/zabbix_server.conf
+  sudo sed -r -i -e "s+# DBPassword=+DBPassword=${ZABBIX_PW}+g" /usr/local/etc/zabbix_server.conf
 
   printGreen "Configuring Zabbix frontend files..."
   mkdir --parents /opt/zabbix/active_frontend
