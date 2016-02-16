@@ -77,7 +77,8 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   sudo make install
 
-  sudo cp misc/init.d/ubuntu/zabbix-server.conf /etc/init.d/zabbix-server
+  #sudo cp misc/init.d/ubuntu/zabbix-server.conf /etc/init.d/zabbix-server
+  sudo cp /opt/zabbix/zabbix-server /etc/init.d/zabbix-server
   sudo chmod 755 /etc/init.d/zabbix-server
   sudo update-rc.d zabbix-server defaults
 
