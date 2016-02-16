@@ -51,7 +51,8 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   printGreen "Downloading Zabbix..."
   sudo mkdir --parents /opt/zabbix/
-  sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --password=P6QbP41X "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
+  getPW "ctipath ftp staging" FTP_PW
+  sudo wget --output-document=/opt/zabbix/${ZABBIX_FILE} --user=vitalscli --password=${FTP_PW} "ftp://ftp.ctipath.com/Zabbix_Source/${ZABBIX_FILE}"
   printGreen "Unpacking Zabbix..."
   sudo tar -zxf /opt/zabbix/${ZABBIX_FILE}
 
@@ -166,4 +167,3 @@ table_cache=256\" >> /etc/mysql/conf.d/zabbix_tuning.cnf"
 fi
 
 sudo service zabbix-server start
-
