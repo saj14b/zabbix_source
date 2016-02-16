@@ -30,7 +30,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   CURDIR=`pwd`
   printGreen "Installing dependencies..."
   sudo apt-get -y update
-  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev apache2 php5-cli
+  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev apache2 libapache2-mod-php5
   #need apache php
 
 #  sudo apt-get -y install zabbix-agent
@@ -85,6 +85,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo bash -c "echo \"
 Alias /zabbix /opt/zabbix/active_frontend \" > /etc/apache2/sites-available/zabbix.conf"
   sudo a2ensite zabbix.conf
+  sudo a2dissite 000-default.conf
 
   #tuning php for Zabbix
   sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/cli/php.ini
