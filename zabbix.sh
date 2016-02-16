@@ -7,9 +7,25 @@ printGreen() { /bin/echo -e "\033[32;1m${1}\033[0m" >&2; }
 printBlue()  { /bin/echo -e "\033[34;1m${1}\033[0m" >&2; }
 printYellow(){ /bin/echo -e "\033[33;1m${1}\033[0m" >&2; }
 printRed()   { /bin/echo -e "\033[31;1m${1}\033[0m" >&2; }
+getPW()      {
+    while true; do
+        /bin/echo -e -n "\033[33;1mEnter the password for ${1}: \033[0m"
+        read -s GET_PW1
+        /bin/echo -e -n "\n\033[33;1mRe-Enter the password for ${1}: \033[0m"
+        read -s GET_PW2
+        if [ "${GET_PW1}" == "${GET_PW2}" ]; then
+            eval ${2}="${GET_PW1}"
+            /bin/echo ""
+            break;
+        else
+            printRed "Passwords do not match!"
+        fi
+    done;
+}
 
+###############################################################################
+# Configurations
 ZABBIX_FILE="zabbix-2.4.7.tar.gz"
-MYSQL_PW="root"
 
 ###############################################################################
 # Temporary for debugging
@@ -17,7 +33,7 @@ sudo service ntp stop
 sudo ntpdate -s time.nist.gov
 sudo service ntp start
 
-############
+###############################################################################
 #Install and setup zabbix-server
 INSTALL_ZABBIX=1
 #if [ -e /usr/share/zabbix-server ]; then
@@ -32,11 +48,6 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   sudo apt-get -y update
   sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev
   sudo apt-get -y install apache2 libapache2-mod-php5 php5-mysql php5-gd
-  #need apache php
-
-#  sudo apt-get -y install zabbix-agent
-#  sudo apt-get -y install zabbix-server-mysql
-#  sudo apt-get -y install zabbix-frontend-php --no-install-recommends
 
   printGreen "Downloading Zabbix..."
   sudo mkdir --parents /opt/zabbix/
@@ -53,38 +64,44 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   #MYSQL SETUP
   printGreen "Installing mysql-server..."
+  getPW "mysql root user" MYSQL_PW
   sudo debconf-set-selections <<< "mysql-server mysql-server/root_password password ${MYSQL_PW}"
   sudo debconf-set-selections <<< "mysql-server mysql-server/root_password_again password ${MYSQL_PW}"
   sudo apt-get -y install mysql-server
 
   printGreen "Building Zabbix tables..."
-  Q1="CREATE USER 'zabbix'@'localhost' IDENTIFIED BY '${MYSQL_PW}';"
+  getPW "mysql zabbix user" ZABBIX_PW
+  Q1="CREATE USER 'zabbix'@'localhost' IDENTIFIED BY '${ZABBIX_PW}';"
   Q2="CREATE DATABASE IF NOT EXISTS zabbix;"
   Q3="GRANT ALL PRIVILEGES ON zabbix.* TO 'zabbix'@'localhost';"
   Q4="FLUSH PRIVILEGES;"
   SQL="${Q1}${Q2}${Q3}${Q4}"
   mysql --user=root --password=${MYSQL_PW} --database=mysql --execute="${SQL}"
   printGreen "Applying schema.sql..."
-  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/schema.sql
+  mysql --user=zabbix --password=${ZABBIX_PW} --database=zabbix < database/mysql/schema.sql
   printGreen "Applying images.sql..."
-  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/images.sql
+  mysql --user=zabbix --password=${ZABBIX_PW} --database=zabbix < database/mysql/images.sql
   printGreen "Applying data.sql..."
-  mysql --user=zabbix --password=${MYSQL_PW} --database=zabbix < database/mysql/data.sql
-
+  mysql --user=zabbix --password=${ZABBIX_PW} --database=zabbix < database/mysql/data.sql
 
   sudo mkdir --parents /etc/zabbix
-  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
 
+  printGreen "Configuring source..."
+  ./configure --enable-server --enable-agent --with-mysql --enable-ipv6 --with-net-snmp --with-libcurl --with-libxml2
+  printGreen "Compiling source..."
   sudo make install
 
-  sudo cp misc/init.d/ubuntu/zabbix-server.conf /etc/init/zabbix-server
-  #sudo cp /opt/zabbix/zabbix-server /etc/init/zabbix-server
+  printGreen "Copying startup scripts..."
+  sudo cp misc/init.d/debian/zabbix-server /etc/init.d/zabbix-server
   sudo chmod 755 /etc/init.d/zabbix-server
   sudo update-rc.d zabbix-server defaults
 
+  printGreen "Configuring zabbix configuration files..."
   sudo ln -s /usr/local/etc/zabbix_server.conf /etc/zabbix/zabbix_server.conf
+  sudo sed -r -i -e "s/LogFile=/tmp/zabbix_server.log/LogFile=/var/log/zabbix_server.log/g" /etc/zabbix/zabbix_server.conf
+  sudo sed -r -i -e "s/#DBPassword=/DBPassword=${ZABBIX_PW}/g" /etc/zabbix/zabbix_server.conf
 
-  #printGreen "Copying Zabbix frontend files..."
+  printGreen "Configuring Zabbix frontend files..."
   mkdir --parents /opt/zabbix/active_frontend
   sudo cp --archive frontends/php/* /opt/zabbix/active_frontend
   sudo chown -R www-data:www-data /opt/zabbix/active_frontend
@@ -96,14 +113,14 @@ Alias /zabbix /opt/zabbix/active_frontend
   sudo a2ensite zabbix.conf
   sudo a2dissite 000-default.conf
 
-  #tuning php for Zabbix
+  printGreen "Tuning php for Zabbix..."
   sudo sed -r -i -e "s/post_max_size = 8M/post_max_size = 16M/g" /etc/php5/apache2/php.ini
   sudo sed -r -i -e "s/max_execution_time = 30/max_execution_time = 300/g" /etc/php5/apache2/php.ini
   sudo sed -r -i -e "s/max_input_time = 60/max_input_time = 300/g" /etc/php5/apache2/php.ini
   sudo sed -r -i -e "s/;date\.timezone =/date.timezone = \"America\/New_York\"/g" /etc/php5/apache2/php.ini
   sudo /etc/init.d/apache2 reload
   
-  #mysql tuning
+  printGreen "Tuning MySQL for Zabbix..."
   sudo bash -c "echo \"
   
 #######################
@@ -130,12 +147,13 @@ table_cache=256\" >> /etc/mysql/conf.d/zabbix_tuning.cnf"
   #apply config
   sudo service mysql restart
   
-  #link in vitalscli script
+  printGreen "Linking in vitalscli scripts..."
   sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /usr/local/share/zabbix/alertscripts/
   sudo ln -sf /opt/vitalscli/vitalscli_push_nms.sh /usr/local/share/zabbix/externalscripts/
   sudo usermod -s /bin/bash zabbix
 
-  #zabbix user has to be able to sudo as vitalscli user to run vitalscli  
+  printGreen "Configuring zabbix user..."
+  #zabbix user has to be able to sudo as vitalscli user to run vitalscli
   sudo bash -c "echo -e \"zabbix  ALL=(vitalscli) NOPASSWD: ALL\" > /etc/sudoers.d/vitalscli_zabbix"
   sudo chmod 440 /etc/sudoers.d/vitalscli_zabbix
   sudo /etc/init.d/sudo restart
