@@ -30,7 +30,8 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   CURDIR=`pwd`
   printGreen "Installing dependencies..."
   sudo apt-get -y update
-  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev apache2 libapache2-mod-php5
+  sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev
+  sudo apt-get -y instlal apache2 libapache2-mod-php5 php5-mysql php5-gd
   #need apache php
 
 #  sudo apt-get -y install zabbix-agent
@@ -82,6 +83,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   #printGreen "Copying Zabbix frontend files..."
   mkdir --parents /opt/zabbix/active_frontend
   sudo cp --archive frontends/php/* /opt/zabbix/active_frontend
+  sudo chown -R www-data:www-data /opt/zabbix/active_frontend
   sudo bash -c "echo \"
 Alias /zabbix /opt/zabbix/active_frontend
 <Directory /opt/zabbix/active_frontend>
