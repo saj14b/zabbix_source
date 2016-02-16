@@ -83,7 +83,10 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   mkdir --parents /opt/zabbix/active_frontend
   sudo cp --archive frontends/php/* /opt/zabbix/active_frontend
   sudo bash -c "echo \"
-Alias /zabbix /opt/zabbix/active_frontend \" > /etc/apache2/sites-available/zabbix.conf"
+Alias /zabbix /opt/zabbix/active_frontend
+<Directory /opt/zabbix/active_frontend>
+  Require all granted
+</Directory>\" > /etc/apache2/sites-available/zabbix.conf"
   sudo a2ensite zabbix.conf
   sudo a2dissite 000-default.conf
 
