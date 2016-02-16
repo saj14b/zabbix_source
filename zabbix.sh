@@ -79,6 +79,9 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
 
   sudo cp misc/init.d/ubuntu/zabbix-server.conf /etc/init.d/zabbix-server
   sudo chmod 755 /etc/init.d/zabbix-server
+  sudo update-rc.d zabbix-server defaults
+
+  sudo ln -s /usr/local/etc/zabbix_server.conf /etc/zabbix/zabbix_server.conf
 
   #printGreen "Copying Zabbix frontend files..."
   mkdir --parents /opt/zabbix/active_frontend
