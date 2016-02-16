@@ -31,7 +31,7 @@ if [ $INSTALL_ZABBIX -eq 1 ]; then
   printGreen "Installing dependencies..."
   sudo apt-get -y update
   sudo apt-get -y install debconf-utils build-essential libmysqld-dev libxml2-dev libsnmp-dev libcurl4-gnutls-dev
-  sudo apt-get -y instlal apache2 libapache2-mod-php5 php5-mysql php5-gd
+  sudo apt-get -y install apache2 libapache2-mod-php5 php5-mysql php5-gd
   #need apache php
 
 #  sudo apt-get -y install zabbix-agent
