@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# installs zabbix from source compilation
+###############################################################################
+# Installs Zabbix via source compilation
 
+###############################################################################
+#
 printPlain() { /bin/echo -e "${1}" >&2; }
 printGreen() { /bin/echo -e "\033[32;1m${1}\033[0m" >&2; }
 printBlue()  { /bin/echo -e "\033[34;1m${1}\033[0m" >&2; }
@@ -25,6 +28,8 @@ getPW()      {
 
 ###############################################################################
 # Configurations
+#==============================================================================
+# ZABBIX_FILE - filename of the zabbix zip located at ftp site
 ZABBIX_FILE="zabbix-2.4.7.tar.gz"
 
 ###############################################################################
@@ -34,14 +39,14 @@ sudo ntpdate -s time.nist.gov
 sudo service ntp start
 
 ###############################################################################
-#Install and setup zabbix-server
+# Install and setup zabbix-server
 INSTALL_ZABBIX=1
-#if [ -e /usr/share/zabbix-server ]; then
-#  read -p "Zabbix is already installed, reinstall? (y/n): " -e REINSTALL_ZABBIX
-#  if [ "${REINSTALL_ZABBIX}" != 'y' ]; then
-#    INSTALL_ZABBIX=0
-#  fi
-#fi
+if [ -e /opt/zabbix ]; then
+  read -p "Zabbix is already installed, reinstall? (y/n): " -e REINSTALL_ZABBIX
+  if [ "${REINSTALL_ZABBIX}" != 'y' ]; then
+    INSTALL_ZABBIX=0
+  fi
+fi
 if [ $INSTALL_ZABBIX -eq 1 ]; then
   CURDIR=`pwd`
   printGreen "Installing dependencies..."
